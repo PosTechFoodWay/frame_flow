@@ -1,0 +1,67 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: my_redis
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:15
+    container_name: database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 2
+
+  auth_service:
+    build:
+      context: ./services/auth_service
+    container_name: auth_service
+    environment:
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL}
+      AUTH_KEY: ${AUTH_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./services/auth_service/auth_service:/app/auth_service
+
+  upload_service:
+    build:
+      context: ./services/upload_service
+    container_name: upload_service
+    depends_on:
+      - db
+      - redis
+      - auth_service
+    environment:
+      UPLOAD_DATABASE_URL: ${UPLOAD_DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      AWS_REGION_NAME: ${AWS_REGION_NAME}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./services/upload_service/upload_service:/app/upload_service
+
+volumes:
+  pgdata:
