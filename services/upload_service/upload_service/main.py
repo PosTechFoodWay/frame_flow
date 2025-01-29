@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     )
     app.state.aws_session = aws_session
 
-    print(">> Startup: created db_pool and redis async client.")
+    print(">> Startup: created db_pool, redis async client, and AWS session.")
 
     yield
 

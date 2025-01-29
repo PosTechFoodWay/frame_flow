@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 from pathlib import Path
 from typing import Any
 import aioboto3
@@ -9,6 +8,7 @@ from fastapi import UploadFile
 from upload_service.config import config
 from upload_service.repo import FileRepository
 from uuid import uuid4
+from .models import FileUploadedEvent
 
 
 class UploadService:
@@ -31,6 +31,8 @@ class UploadService:
         s3_key = f"{user_id}/{unique_filename}"
 
         async with self.aws_session.client("s3") as s3_client:
+            print(f">> Uploading file to S3: {s3_key}")
+            print(f">> Bucket name: {config.s3_bucket_name}")
             bucket_name = config.s3_bucket_name
             await s3_client.upload_fileobj(file.file, bucket_name, s3_key)
             s3_path = f"s3://{bucket_name}/{s3_key}"
@@ -42,7 +44,16 @@ class UploadService:
 
         # Publica evento no Redis
         event_id = str(uuid4())
-        event_data = {"id": file_id, "s3_path": s3_path, "user_id": user_id, "event_id": event_id}
-        await self.redis_client.publish("saga_events", json.dumps(event_data))
+        file_uploaded_event = FileUploadedEvent(
+            file_id=file_id, event_id=event_id, s3_path=s3_path, user_id=user_id
+        )
+        await self.redis_client.publish("saga_events", file_uploaded_event.model_dump_json())
+        await self.redis_client.set(event_id, "FILE_UPLOADED")
 
-        return {"id": file_id, "filename": file.filename}
+        return {"id": file_id, "filename": file.filename, "event_id": event_id}
+
+    async def get_upload_status(self, event_id: str) -> str:
+        """
+        Retorna o status do upload de um arquivo.
+        """
+        return await self.redis_client.get(event_id)

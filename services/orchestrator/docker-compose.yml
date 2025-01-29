@@ -1,0 +1,23 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: orchestrator_redis
+    ports:
+      - "6379:6379"
+
+  upload_service:
+    build: .
+    container_name: upload_service
+    env_file:
+      - .env
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+    depends_on:
+      - redis
+    ports:
+      - "8002:8000" 
+
+volumes:
+  pgdata:

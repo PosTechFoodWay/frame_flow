@@ -62,6 +62,23 @@ services:
       - "8001:8000"
     volumes:
       - ./services/upload_service/upload_service:/app/upload_service
+  
+  orchestrator:
+    build:
+      context: ./services/orchestrator
+    container_name: orchestrator
+    depends_on:
+      - redis
+      - auth_service
+      - upload_service
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./services/orchestrator/orchestrator:/app/orchestrator
 
 volumes:
   pgdata:

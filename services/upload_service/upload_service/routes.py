@@ -82,26 +82,3 @@ async def upload_file(
     if "error" in result:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=result["error"])
     return result
-
-
-# @router.get("/redis-subscribe")
-# async def redis_subscribe(r: Redis = Depends(get_redis_client)):
-#     async with r.pubsub() as pubsub:
-#         # 1. Subscribe first
-#         await pubsub.subscribe("file_uploaded")
-
-#         # 2. Publish
-#         await r.publish("file_uploaded", "Hello from Upload Service!")
-
-#         # 3. Wait for the message
-#         messages = []
-#         time.sleep(1)
-#         for _ in range(10):
-#             # Try to read a message
-#             msg = await pubsub.get_message(ignore_subscribe_messages=True, timeout=0.2)
-#             if msg is not None:
-#                 messages.append(msg)
-#                 # If we only care about the first message, break here
-#                 break
-
-#         return {"received": messages}
