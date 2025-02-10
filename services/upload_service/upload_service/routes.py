@@ -84,11 +84,6 @@ async def upload_file(
     return result
 
 
-@router.get("/health")
-async def health():
-    return {"message": "Upload service is running"}
-
-
 @router.get("/upload/status/{event_id}")
 async def upload_status(event_id: str, upload_svc: UploadService = Depends(get_upload_service)):
     status = await upload_svc.get_upload_status(event_id)

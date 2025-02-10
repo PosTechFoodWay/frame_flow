@@ -71,6 +71,7 @@ services:
       - redis
       - auth_service
       - upload_service
+      - process_service
     environment:
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT}
@@ -87,7 +88,6 @@ services:
     depends_on:
       - db
       - redis
-      - auth_service
     environment:
       PROCESS_DATABASE_URL: ${PROCESS_DATABASE_URL}
       REDIS_HOST: ${REDIS_HOST}
@@ -102,6 +102,28 @@ services:
       - "8003:8000"
     volumes:
       - ./services/process_service/process_service:/app/process_service
+
+  download_service:
+    build:
+      context: ./services/download_service
+    container_name: download_service
+    depends_on:
+      - redis
+      - auth_service
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      AWS_REGION_NAME: ${AWS_REGION_NAME}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./services/download_service/download_service:/app/download_service
 
 volumes:
   pgdata:

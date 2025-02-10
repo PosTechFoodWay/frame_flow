@@ -8,9 +8,8 @@ Create Date: 2025-01-30 20:59:28.810465
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "d7dae902e9d7"
@@ -32,4 +31,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    pass
+    op.drop_table("file_process")

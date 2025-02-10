@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from contextlib import asynccontextmanager
 
@@ -9,7 +10,6 @@ from fastapi import FastAPI
 from .config import config
 from .models import ProcessFileEventModel
 from .process import ProcessFileEvent
-import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,7 +41,6 @@ async def redis_listener(redis_client: redis.Redis, aws_session: aioboto3.Sessio
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Initializing Redis client...")
     r = redis.Redis(
         host=config.redis_host, port=config.redis_port, db=config.redis_db, decode_responses=True
     )
@@ -61,7 +60,6 @@ async def lifespan(app: FastAPI):
     # Cleanup
     task.cancel()
     await r.aclose()
-    logger.info("Redis client closed.")
 
 
 def create_app() -> FastAPI:

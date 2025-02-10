@@ -1,16 +1,17 @@
 import asyncio
 import io
 import logging
+import os
 import shutil
+from urllib.parse import urlparse
+
 import aioboto3
 import aiofiles
 import ffmpeg
 import redis.asyncio as redis
-from urllib.parse import urlparse
-import os
-
-from .models import ProcessFileEventModel, FileProcessedEvent
 from zipstream import AioZipStream
+
+from .models import FileProcessedEvent, ProcessFileEventModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

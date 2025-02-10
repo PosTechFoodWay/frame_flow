@@ -9,4 +9,7 @@ docker-compose exec auth_service poetry run alembic upgrade head
 echo "Rodando as migrações Alembic no contêiner 'upload_service'..."
 docker-compose exec upload_service poetry run alembic upgrade head
 
+echo "Rodando as migrações Alembic no contêiner 'process_service'..."
+docker-compose exec process_service poetry run alembic upgrade head
+
 echo "Migrações aplicadas com sucesso!"
