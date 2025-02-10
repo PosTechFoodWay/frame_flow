@@ -22,5 +22,6 @@ class FileUploadedHandler(IEventHandler):
             user_id=event.user_id,
             s3_path=event.s3_path,
         )
+        logging.info(f"Sending process file event: {process_file_event.model_dump_json()}")
         await self.redis_client.publish("process_file", process_file_event.model_dump_json())
         await self.redis_client.set(event.event_id, "SENT_TO_FILE_PROCESSING")

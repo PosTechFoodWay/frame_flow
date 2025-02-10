@@ -25,10 +25,11 @@ class UploadService:
         Publica evento no Redis e salva metadados no Postgres.
         """
         # Gera um nome único no S3 (uuid + extensao)
+        event_id = str(uuid4())
         file_ext = Path(file.filename).suffix.lower()
         unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S%f')}{file_ext}"
 
-        s3_key = f"{user_id}/{unique_filename}"
+        s3_key = f"{user_id}/{event_id}/{unique_filename}"
 
         async with self.aws_session.client("s3") as s3_client:
             print(f">> Uploading file to S3: {s3_key}")
@@ -43,7 +44,6 @@ class UploadService:
         )
 
         # Publica evento no Redis
-        event_id = str(uuid4())
         file_uploaded_event = FileUploadedEvent(
             file_id=file_id, event_id=event_id, s3_path=s3_path, user_id=user_id
         )

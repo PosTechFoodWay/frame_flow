@@ -80,5 +80,28 @@ services:
     volumes:
       - ./services/orchestrator/orchestrator:/app/orchestrator
 
+  process_service:
+    build:
+      context: ./services/process_service
+    container_name: process_service
+    depends_on:
+      - db
+      - redis
+      - auth_service
+    environment:
+      PROCESS_DATABASE_URL: ${PROCESS_DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_DB: ${REDIS_DB}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      AWS_REGION_NAME: ${AWS_REGION_NAME}
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./services/process_service/process_service:/app/process_service
+
 volumes:
   pgdata:

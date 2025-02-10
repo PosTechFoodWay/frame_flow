@@ -1,12 +1,11 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
-    auth_service_url: str = "http://host.internal.docker:8000"
-
     database_url: str = Field(
-        "postgresql://postgres:postgres@localhost/upload_db", alias="UPLOAD_DATABASE_URL"
+        "postgresql://postgres:postgres@localhost/process_db",
+        alias="PROCESS_DATABASE_URL",
     )
     redis_host: str = "redis"
     redis_port: int = 6379

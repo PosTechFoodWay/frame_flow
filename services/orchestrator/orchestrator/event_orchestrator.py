@@ -1,5 +1,5 @@
 from .models import BaseEvent
-from .handlers import IEventHandler, FileUploadedHandler
+from .handlers import IEventHandler, FileUploadedHandler, FileProcessedHandler
 from redis.asyncio import Redis
 from .models import SagaEventTypes
 
@@ -8,6 +8,7 @@ class EventOrchestrator:
     def __init__(self, redis_client: Redis):
         self._handlers = {
             SagaEventTypes.FILE_UPLOADED: FileUploadedHandler(redis_client),
+            SagaEventTypes.FILE_PROCESSED: FileProcessedHandler(redis_client),
         }
         self._redis_client = redis_client
 
